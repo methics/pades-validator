@@ -4,11 +4,15 @@ This is a simple tool for validating signed PDF files.
 
 ##### Compiling
 
-```mvn compile```
+```
+mvn compile
+```
 
 ##### Running
 
-```mvn exec:java -Dexec.mainClass="fi.methics.validator.pades.PAdESValidator" -Dexec.args="-pdf=example.pdf -jks=truststore.jks"```
+```
+mvn exec:java -Dexec.mainClass="fi.methics.validator.pades.PAdESValidator" -Dexec.args="-pdf=example.pdf -jks=truststore.jks"
+```
 
 ##### Usage
 
