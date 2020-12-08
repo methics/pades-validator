@@ -27,6 +27,7 @@ import eu.europa.esig.dss.spi.x509.CommonTrustedCertificateSource;
 import eu.europa.esig.dss.spi.x509.revocation.crl.CRLSource;
 import eu.europa.esig.dss.spi.x509.revocation.ocsp.OCSPSource;
 import eu.europa.esig.dss.validation.CommonCertificateVerifier;
+import eu.europa.esig.dss.validation.executor.ValidationLevel;
 import eu.europa.esig.dss.validation.reports.Reports;
 
 /**
@@ -79,7 +80,7 @@ public class PAdESValidator {
                 validator.setKeystore(keystore);
             }
             System.out.println("Validating file: " + validator.filename);
-            System.out.println("Signature Valid: " + validator.validate());
+            System.out.println("All signatures valid: " + validator.validate());
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -127,17 +128,26 @@ public class PAdESValidator {
         DSSDocument          signedDoc = new InMemoryDocument(this.file);
         PDFDocumentValidator validator = new PDFDocumentValidator(signedDoc);
  
+        validator.setValidationLevel(ValidationLevel.BASIC_SIGNATURES);
         validator.setCertificateVerifier(this.createVerifier());
         Reports reports = validator.validateDocument();
         
         SimpleReport simpleReport = reports.getSimpleReport();
-        String  id = simpleReport.getFirstSignatureId();
-        System.out.println("Validation:");
-        System.out.println("  Info    : " + simpleReport.getInfo(id));
-        System.out.println("  Errors  : " + simpleReport.getErrors(id));
-        System.out.println("  Warnings: " + simpleReport.getWarnings(id));
+        boolean      anyFail      = false;
+        System.out.println("Validating " + simpleReport.getSignaturesCount() + " signatures");
+        for (String id : simpleReport.getSignatureIdList()) {
+            System.out.println("Validating Signature " + id + ":");
+            boolean valid = simpleReport.isSignatureValid(id);
+            System.out.println("  Valid: " + valid);
+            if (!valid) {
+                System.out.println("  Info    : " + simpleReport.getInfo(id));
+                System.out.println("  Errors  : " + simpleReport.getErrors(id));
+                System.out.println("  Warnings: " + simpleReport.getWarnings(id));
+                anyFail = true;
+            }
+        }
         
-        return simpleReport.isSignatureValid(id);
+        return !anyFail;
     }
     
     /**
