@@ -1,5 +1,7 @@
 # pades-validator
 
+This is a simple tool for validating signed PDF files.
+
 ##### Compiling
 
 ```mvn compile```
