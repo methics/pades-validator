@@ -8,7 +8,7 @@ This is a simple tool for validating signed PDF files.
 
 ##### Running
 
-```mvn exec:java -Dexec.mainClass="fi.methics.validator.pades.PAdESValidator" -Dexec.args="-pdf=C:\Temp\example.pdf"```
+```mvn exec:java -Dexec.mainClass="fi.methics.validator.pades.PAdESValidator" -Dexec.args="-pdf=example.pdf -jks=truststore.jks"```
 
 ##### Usage
 
