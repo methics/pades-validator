@@ -44,7 +44,7 @@ public class PAdESValidator {
             System.out.println("Usage: fi.methics.validator.pades.PAdESValidator [OPTIONS]");
             System.out.println();
             System.out.println("Options:");
-            System.out.println("  -signed=               - PAdES signed file path");
+            System.out.println("  -pdf=PATH              - PAdES signed file path");
             System.out.println("  -jks=VALUE             - optional path to truststore file");
             System.out.println("  -jkspwd=VALUE          - optional truststore password");
             System.out.println();
@@ -152,12 +152,14 @@ public class PAdESValidator {
         DataLoader dataLoader = new NativeHTTPDataLoader();
         CertificateSource certSource = new CommonTrustedCertificateSource();
         
-        Enumeration<String> e = this.keystore.aliases();
-        while (e.hasMoreElements()) {
-            String name = e.nextElement();
-            System.out.println("Adding " + name + " as trusted certificate");
-            Certificate cert = this.keystore.getCertificate(name);
-            certSource.addCertificate(new CertificateToken((X509Certificate)cert));
+        if (this.keystore != null) {
+            Enumeration<String> e = this.keystore.aliases();
+            while (e.hasMoreElements()) {
+                String name = e.nextElement();
+                System.out.println("Adding " + name + " as trusted certificate");
+                Certificate cert = this.keystore.getCertificate(name);
+                certSource.addCertificate(new CertificateToken((X509Certificate)cert));
+            }
         }
 
         CommonCertificateVerifier verifier = new CommonCertificateVerifier(certSource, crlSource, ocspSource, dataLoader);
