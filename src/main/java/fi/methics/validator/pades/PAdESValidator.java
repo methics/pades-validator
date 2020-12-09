@@ -7,12 +7,9 @@ import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Enumeration;
-
-import org.bouncycastle.cms.CMSException;
 
 import eu.europa.esig.dss.alert.LogOnStatusAlert;
 import eu.europa.esig.dss.model.DSSDocument;
