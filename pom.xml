@@ -52,52 +52,52 @@
 	<dependency>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-model</artifactId>
-		<version>5.5</version>
+		<version>5.7</version>
 	</dependency>
 	<dependency>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-spi</artifactId>
-		<version>5.5</version>
+		<version>5.7</version>
 	</dependency>
 	<dependency>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-token</artifactId>
-		<version>5.5</version>
+		<version>5.7</version>
 	</dependency>
 	<dependency>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-simple-report-jaxb</artifactId>
-		<version>5.5</version>
+		<version>5.7</version>
 	</dependency>
 	<dependency>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-service</artifactId>
-		<version>5.5</version>
+		<version>5.7</version>
 	</dependency>
 	<dependency>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-document</artifactId>
-		<version>5.5</version>
+		<version>5.7</version>
 	</dependency>
 		<dependency>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-pades</artifactId>
-		<version>5.5</version>
+		<version>5.7</version>
 	</dependency>
 	<dependency>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-pades-pdfbox</artifactId>
-		<version>5.5</version>
+		<version>5.7</version>
 	</dependency>
 	<dependency>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-utils-google-guava</artifactId>
-		<version>5.5</version>
+		<version>5.7</version>
 	</dependency>
 	<dependency>
 		<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 		<artifactId>dss-crl-parser-x509crl</artifactId>
-		<version>5.5</version>
+		<version>5.7</version>
 	</dependency>
   </dependencies>
 </project>

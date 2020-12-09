@@ -9,10 +9,12 @@ import java.security.KeyStoreException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Enumeration;
 
 import org.bouncycastle.cms.CMSException;
 
+import eu.europa.esig.dss.alert.LogOnStatusAlert;
 import eu.europa.esig.dss.model.DSSDocument;
 import eu.europa.esig.dss.model.InMemoryDocument;
 import eu.europa.esig.dss.model.x509.CertificateToken;
@@ -39,6 +41,10 @@ public class PAdESValidator {
     private String filename;
     private KeyStore keystore;
     
+    private boolean enableOcsp = true;
+    private boolean enableCrl  = true;
+    private boolean printReport= false;
+    
     public static void main(String[] args) {
         
         if (args == null || args.length < 1) {
@@ -48,6 +54,9 @@ public class PAdESValidator {
             System.out.println("  -pdf=PATH              - PAdES signed file path");
             System.out.println("  -jks=VALUE             - optional path to truststore file");
             System.out.println("  -jkspwd=VALUE          - optional truststore password");
+            System.out.println("  -nocrl                 - optional flag to disable CRL checks");
+            System.out.println("  -noocsp                - optional flag to disable OCSP checks");
+            System.out.println("  -printreport           - optional flag to print detailed XML report");
             System.out.println();
             System.out.println("Example:");
             System.out.println("  java fi.methics.validator.pades.PAdESValidator -pdf=C:\\tmp\\example.pdf");
@@ -55,7 +64,7 @@ public class PAdESValidator {
         }
         
         try {
-            PAdESValidator validator = null;
+            PAdESValidator validator = new PAdESValidator();
             
             String jks    = null;
             String jkspwd = "changeit";
@@ -63,14 +72,18 @@ public class PAdESValidator {
             String param;
             for (int i = 0; i < args.length; i++) { 
                 param = args[i].toLowerCase();
-                if (param.contains("-jks=")) {
+                if (param.startsWith("-jks=")) {
                     jks = args[i].substring(args[i].indexOf("=") + 1).trim();
-                } 
-                else if (param.contains("-jkspwd=")) {
+                } else if (param.startsWith("-jkspwd=")) {
                     jkspwd = args[i].substring(args[i].indexOf("=") + 1).trim();
-                } 
-                else if (param.contains("-pdf=")) {
-                    validator = new PAdESValidator(args[i].substring(args[i].indexOf("=") + 1).trim());
+                } else if (param.startsWith("-pdf=")) {
+                    validator.setFile(args[i].substring(args[i].indexOf("=") + 1).trim());
+                } else if (param.startsWith("-nocrl")) {
+                    validator.enableCrl = false;
+                } else if (param.startsWith("-noocsp")) {
+                    validator.enableOcsp = false;
+                } else if (param.startsWith("-printreport")) {
+                    validator.printReport = true;
                 }
             }
             if (jks != null) {
@@ -87,7 +100,11 @@ public class PAdESValidator {
         }
     }
 
-    public PAdESValidator(String filename) throws CMSException, CertificateException, IOException {
+    public PAdESValidator() {
+        // Empty constructor
+    }
+    
+    public void setFile(final String filename) throws IOException {
         this.filename = filename;
         this.file     = Files.readAllBytes(Paths.get(filename));
     }
@@ -137,7 +154,7 @@ public class PAdESValidator {
         System.out.println("Validating " + simpleReport.getSignaturesCount() + " signatures");
         for (String id : simpleReport.getSignatureIdList()) {
             System.out.println("Validating Signature " + id + ":");
-            boolean valid = simpleReport.isSignatureValid(id);
+            boolean valid = simpleReport.isValid(id);
             System.out.println("  Valid: " + valid);
             if (!valid) {
                 System.out.println("  Info    : " + simpleReport.getInfo(id));
@@ -145,6 +162,10 @@ public class PAdESValidator {
                 System.out.println("  Warnings: " + simpleReport.getWarnings(id));
                 anyFail = true;
             }
+        }
+        
+        if (this.printReport) {
+            this.printReport(reports);
         }
         
         return !anyFail;
@@ -157,8 +178,8 @@ public class PAdESValidator {
      */
     private CommonCertificateVerifier createVerifier() throws KeyStoreException {
 
-        CRLSource   crlSource = new OnlineCRLSource();
-        OCSPSource ocspSource = new OnlineOCSPSource();
+        CRLSource   crlSource = this.enableCrl ? new OnlineCRLSource() : null; 
+        OCSPSource ocspSource = this.enableOcsp? new OnlineOCSPSource(): null;
         DataLoader dataLoader = new NativeHTTPDataLoader();
         CertificateSource certSource = new CommonTrustedCertificateSource();
         
@@ -172,15 +193,22 @@ public class PAdESValidator {
             }
         }
 
-        CommonCertificateVerifier verifier = new CommonCertificateVerifier(certSource, crlSource, ocspSource, dataLoader);
+        CommonCertificateVerifier verifier = new CommonCertificateVerifier(Arrays.asList(certSource), crlSource, ocspSource, dataLoader);
 
-        verifier.setExceptionOnMissingRevocationData(false);
         verifier.setCheckRevocationForUntrustedChains(true);
-        verifier.setIncludeCertificateRevocationValues(true);
-        verifier.setIncludeTimestampTokenValues(false);
-        verifier.setIncludeCertificateTokenValues(false);
+        verifier.setAlertOnMissingRevocationData(new LogOnStatusAlert());
+        verifier.setCheckRevocationForUntrustedChains(false);
 
         return verifier;
+    }
+    
+    /**
+     * Print a detailed validation report
+     * @param details validation detail report
+     */
+    private void printReport(final Reports reports) {
+        System.out.println("\nDetailed report:");
+        System.out.println(reports.getXmlDetailedReport());
     }
     
 }
