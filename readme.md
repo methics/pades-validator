@@ -23,7 +23,10 @@ Options:
   -signed=               - PAdES signed file path
   -jks=VALUE             - optional path to truststore file
   -jkspwd=VALUE          - optional truststore password
-
+  -nocrl                 - optional flag to disable CRL checks
+  -noocsp                - optional flag to disable OCSP checks
+  -printreport           - optional flag to print detailed XML report
+  
 Example:
   java fi.methics.validator.pades.PAdESValidator -pdf=C:\tmp\example.pdf
 ```
